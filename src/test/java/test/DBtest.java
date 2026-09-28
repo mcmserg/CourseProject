@@ -12,14 +12,16 @@ import org.junit.jupiter.api.Test;
 import page.MainPage;
 
 import static com.codeborne.selenide.Selenide.open;
+import static data.DataHelper.*;
 import static data.DataHelper.CardInfo.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 
 public class DBtest {
 
     @BeforeAll
-    static void setUpAll() { SelenideLogger.addListener("allure", new AllureSelenide()); }
+    static void setUpAll() {
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
 
     @AfterAll
     static void tearDownAll() {
@@ -42,7 +44,7 @@ public class DBtest {
         assertEquals("APPROVED", DBUtils.getPaymentStatus());
     }
 
-    //    NB смотри Issue #3
+
     @Test
     void shouldBeDeclinedWithDeclinedCard() {
         val cardInfo = new DataHelper.CardInfo(getDeclinedCardNumber(), getValidMonth(), getValidYear(), getOwnerName(), getCVC());
@@ -52,5 +54,4 @@ public class DBtest {
         paymentPage.successfullPayment();
         assertEquals("DECLINED", DBUtils.getPaymentStatus());
     }
-
 }

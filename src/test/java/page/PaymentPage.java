@@ -7,10 +7,14 @@ import data.DataHelper.CardInfo;
 import java.time.Duration;
 
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.*;
+import static com.codeborne.selenide.Selectors.byText;
+import static com.codeborne.selenide.Selectors.byCssSelector;
 import static com.codeborne.selenide.Selenide.$;
 
 public class PaymentPage {
+
+    private SelenideElement cardPaymentHeader = $(byText("Оплата по карте"));
+    private SelenideElement creditPaymentHeader = $(byText("Кредит по данным карты"));
 
     private SelenideElement cardNumber = $(byText("Номер карты")).parent().$(".input__control");
     private SelenideElement month = $(byText("Месяц")).parent().$(".input__control");
@@ -25,7 +29,17 @@ public class PaymentPage {
     private SelenideElement ownerError = $(byText("Владелец")).parent().$(".input__sub");
     private SelenideElement cvcError = $(byText("CVC/CVV")).parent().$(".input__sub");
 
-    public void fillForm (CardInfo cardInfo){
+    public PaymentPage shouldBeCardPaymentPage() {
+        cardPaymentHeader.shouldBe(visible);
+        return this;
+    }
+
+    public PaymentPage shouldBeCreditPaymentPage() {
+        creditPaymentHeader.shouldBe(visible);
+        return this;
+    }
+
+    public void fillForm(CardInfo cardInfo) {
         cardNumber.setValue(cardInfo.getCardNumber());
         month.setValue(cardInfo.getMonth());
         year.setValue(cardInfo.getYear());
@@ -36,43 +50,31 @@ public class PaymentPage {
 
     public void notFilledForm() {
         continueButton.click();
-        cardNumberError.shouldBe(visible);
-        monthError.shouldBe(visible);
-        yearError.shouldBe(visible);
-        ownerError.shouldBe(visible);
-        cvcError.shouldBe(visible);
+        cardNumberError.shouldHave(Condition.exactText("Неверный формат"));
+        monthError.shouldHave(Condition.exactText("Неверно указан срок действия карты"));
+        yearError.shouldHave(Condition.exactText("Неверно указан срок действия карты"));
+        ownerError.shouldHave(Condition.exactText("Поле обязательно для заполнения"));
+        cvcError.shouldHave(Condition.exactText("Неверный формат"));
     }
 
-    public void cardNumberErrorVisible(){
-        cardNumberError.shouldBe(visible);
-    }
-
-    public void monthErrorVisible(){
-        monthError.shouldBe(visible);
-    }
-
-    public void yearErrorVisible(){
-        yearError.shouldBe(visible);
-    }
-
-    public void expiredCardErrorVisible() {
-        expiredCardError.shouldBe(visible);
-    }
-
-    public void ownerErrorVisible(){
-        ownerError.shouldBe(visible);
-    }
-
-    public void cvcErrorVisible(){
-        cvcError.shouldBe(visible);
-    }
+    public void cardNumberErrorVisible() { cardNumberError.shouldBe(visible); }
+    public void monthErrorVisible() { monthError.shouldBe(visible); }
+    public void yearErrorVisible() { yearError.shouldBe(visible); }
+    public void expiredCardErrorVisible() { expiredCardError.shouldBe(visible); }
+    public void ownerErrorVisible() { ownerError.shouldBe(visible); }
+    public void cvcErrorVisible() { cvcError.shouldBe(visible); }
 
     public void successfullPayment() {
         $(".notification_status_ok").shouldBe(Condition.visible, Duration.ofSeconds(30));
     }
 
     public void declinedPayment() {
-        $(byCssSelector("div.notification.notification_status_error.notification_has-closer.notification_stick-to_right.notification_theme_alfa-on-white")).shouldBe(Condition.visible, Duration.ofSeconds(20));
+        $(".notification_status_error")
+                .shouldBe(visible, Duration.ofSeconds(20))
+                .$(".notification__title")
+                .shouldHave(Condition.exactText("Ошибка"));
+        $(".notification_status_error")
+                .$(".notification__content")
+                .shouldHave(Condition.exactText("Ошибка! Банк отказал в проведении операции."));
     }
-
 }

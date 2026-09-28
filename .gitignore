@@ -4,6 +4,7 @@ HELP.md
 build/
 node_modules
 data
+.idea
 
 <<<<<<< HEAD
 ### IntelliJ IDEA ###

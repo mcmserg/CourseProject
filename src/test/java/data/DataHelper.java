@@ -14,7 +14,6 @@ public class DataHelper {
     public static Faker faker = new Faker(new Locale("en"));
 
     @Value
-    @RequiredArgsConstructor
     public static class CardInfo {
         private String cardNumber;
         private String month;
